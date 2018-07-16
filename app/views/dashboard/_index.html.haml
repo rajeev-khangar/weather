@@ -1,0 +1,55 @@
+.row
+  .col-md-12  
+    = form_for :search, method: :get, remote: true do |f|
+      = f.text_field :city_name, value: @city
+      = f.submit "search"
+%br
+- if @response && @response['query']['results']['channel']['item']
+  - location = @response['query']['results']['channel']['location']
+  - atmosphere = @response['query']['results']['channel']['atmosphere']
+  - condition = @response['query']['results']['channel']['item']['condition']
+  - forecast = @response['query']['results']['channel']['item']['forecast']
+  .row
+    .col-md-12
+      %h2= "#{location['city']}, #{location['country']}, #{location['region']}"
+  .row
+    .col-md-4
+      .card
+        .card-header 
+          = condition['date']
+        .card-body
+          .row  
+            .col-md-9
+              = "temparature #{condition['temp']}°F"
+            .col-md-3
+              = image_tag(condition['text'].downcase.split(' ').join('_')) 
+    .col-md-4
+      .card
+        .card-header 
+          Atmosphere
+        .card-body
+          %ul
+            %li= "Humidity: #{atmosphere['humidity']}"
+            %li= "Pressure: #{atmosphere['pressure']}"
+            %li= "Rising: #{atmosphere['rising']}"
+            %li= "Visibility: #{atmosphere['visibility']}"
+
+  .row
+    - forecast.each do |time|
+      .card.m-3
+        .card-header 
+          = "#{time['date']}, #{time['day']}"
+        .card-body
+          .row 
+            .col-md-8
+              %b High
+              = "#{time['high']}°F"
+              %br
+              %b Low
+              = "#{time['low']}°F"
+            .col-md-4
+              = image_tag(time['text'].downcase.split(' ').join('_'))
+- else
+  .row
+    .col-md-12
+      %h2 Location Not Found
